@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chat-container {
+            width: 90%;
+            max-width: 700px;
+            height: 650px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: #222;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+        }
+
+        .header p {
+            margin-top: 5px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        #chat {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            border-radius: 12px;
+            max-width: 80%;
+            line-height: 1.5;
+        }
+
+        .user {
+            background: #222;
+            color: white;
+            margin-left: auto;
+        }
+
+        .assistant {
+            background: #e9ecef;
+            color: #222;
+            margin-right: auto;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            border-top: 1px solid #ddd;
+        }
+
+        #messageInput {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        #sendButton {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #222;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #sendButton:hover {
+            background: #444;
+        }
+
+        #sendButton:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="chat-container">
+
+        <div class="header">
+            <h1>🤖 AI Chatbot</h1>
+            <p>Ask me anything</p>
+        </div>
+
+        <div id="chat"></div>
+
+        <div class="input-area">
+            <input
+                type="text"
+                id="messageInput"
+                placeholder="Type your message..."
+            />
+
+            <button id="sendButton">
+                Send
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+
+        const chat = document.getElementById("chat");
+        const messageInput = document.getElementById("messageInput");
+        const sendButton = document.getElementById("sendButton");
+
+        // Conversation history
+        const messages = [];
+
+        function displayMessage(role, content) {
+
+            const messageDiv = document.createElement("div");
+
+            messageDiv.classList.add("message");
+
+            if (role === "user") {
+                messageDiv.classList.add("user");
+            } else {
+                messageDiv.classList.add("assistant");
+            }
+
+            messageDiv.textContent = content;
+
+            chat.appendChild(messageDiv);
+
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        async function sendMessage() {
+
+            const message = messageInput.value.trim();
+
+            if (!message) {
+                return;
+            }
+
+            // Add user's message to conversation history
+            messages.push({
+                role: "user",
+                content: message
+            });
+
+            displayMessage("user", message);
+
+            messageInput.value = "";
+
+            sendButton.disabled = true;
+            sendButton.textContent = "Thinking...";
+
+            try {
+
+                const response = await fetch("http://localhost:3000/chat", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        messages: messages
+                    })
+
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Request failed");
+                }
+
+                // Add AI response to conversation history
+                messages.push({
+                    role: "assistant",
+                    content: data.reply
+                });
+
+                displayMessage("assistant", data.reply);
+
+            } catch (error) {
+
+                console.error(error);
+
+                displayMessage(
+                    "assistant",
+                    "Sorry, something went wrong. Please try again."
+                );
+
+            } finally {
+
+                sendButton.disabled = false;
+                sendButton.textContent = "Send";
+
+                messageInput.focus();
+            }
+        }
+
+        sendButton.addEventListener("click", sendMessage);
+
+        messageInput.addEventListener("keydown", function(event) {
+
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+
+        });
+
+    </script>
+
+</body>
+</html>
