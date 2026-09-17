@@ -1,46 +1,16 @@
-# AI Chatbot — Challenge 1.11
+# AI Chatbot
 
-An AI-powered chatbot built using Node.js, Express, OpenRouter, and Vanilla JavaScript.
+## What I Built
+A minimal AI chatbot with a Node.js Express backend and a vanilla JS frontend.
 
-## Features
+## API and Model
+**API:** OpenRouter  
+**Model:** openai/gpt-4o-mini
 
-- 💬 Chat with an AI assistant
-- 🤖 OpenRouter AI integration
-- 🔄 Conversation history
-- 🌐 Frontend and backend architecture
-- ⚡ REST API using Express
-- 🔐 API key stored securely using environment variables
-- 📱 Simple responsive chatbot interface
+**Why backend only:** API keys exposed in frontend JavaScript are readable by anyone who opens browser DevTools. The API key is therefore kept securely in the backend.
 
-## Tech Stack
+**Fallback provider:** Google Gemini API (free tier). Switching requires changing the base URL.
 
-### Frontend
-- HTML
-- CSS
-- Vanilla JavaScript
-
-### Backend
-- Node.js
-- Express.js
-- CORS
-- dotenv
-
-### AI
-- OpenRouter API
-
-## Project Structure
-
-```text
-ai-chatbot-challenge-1.11/
-│
-├── backend/
-│   ├── .env.example
-│   ├── package.json
-│   ├── package-lock.json
-│   └── server.js
-│
-├── frontend/
-│   └── index.html
-│
-├── .gitignore
-└── README.md
+## Live Deployment
+**Frontend:** https://sparkling-dango-8b3b66.netlify.app/  
+**Backend:** https://ai-chatbot-challenge-1-11-1.onrender.com/
